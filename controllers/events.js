@@ -1,5 +1,6 @@
 const { response } = require("express");
 const Event = require("../models/Event");
+const { default: mongoose } = require("mongoose");
 
 const getEvents = async (req, res = response) => {
 
@@ -35,6 +36,13 @@ const createEvents = async(req, res = response) => {
 const updateEvent = async(req, res = response) => {
     const eventId = req.params.id;
     const uid = req.uid;
+
+    if (!mongoose.Types.ObjectId.isValid(eventId)) {
+        return res.status(400).json({
+            ok: false,
+            msg: "Invalid event ID.",
+        });
+    }
 
     try {
         const event = await Event.findById(eventId);
@@ -72,11 +80,6 @@ const updateEvent = async(req, res = response) => {
 			msg: "Something went wrong.",
 		});
     }
-
-	res.json({
-		ok: true,
-        eventId
-	});
 };
 
 const removeEvent = async(req, res = response) => {
